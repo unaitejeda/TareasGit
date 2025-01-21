@@ -22,8 +22,14 @@ class tareas extends Model
         'idestado',
         'likes',
         'dislikes',
+        'user_id'
     ];
 
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     /**
      * Relación con el lugar.
      */
@@ -37,7 +43,7 @@ class tareas extends Model
      */
     public function momento()
     {
-        return $this->belongsTo(MomentoDia::class, 'idmomento');
+        return $this->belongsTo(momentodia::class, 'idmomento');
     }
 
     /**

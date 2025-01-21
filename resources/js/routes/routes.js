@@ -127,7 +127,7 @@ export default [
         // redirect: {
         //     name: 'admin.index'
         // },
-        beforeEnter: requireAdmin,
+        // beforeEnter: requireAdmin,
         meta: { breadCrumb: 'Dashboard' },
         children: [
             {
@@ -272,8 +272,31 @@ export default [
                 path: 'roles/edit/:id',
                 component: () => import('../views/admin/roles/Edit.vue'),
                 meta: { breadCrumb: 'Role Edit' }
-            },
-
+            },{
+                name: 'tareas',
+                path: 'tareas',
+                meta: { breadCrumb: 'Tareas' },
+                children: [
+                    {
+                        name: 'tareas.usuario',
+                        path: 'usuario',
+                        component: () => import('../views/TareasUsuario.vue'),
+                        meta: { breadCrumb: 'Tareas Usuario' }
+                    },
+                    {
+                        name: 'tareas.generales',
+                        path: 'generales',
+                        component: () => import('../views/TareasGenerales.vue'),
+                        meta: { breadCrumb: 'Tareas Generales' }
+                    },
+                    {
+                        name: 'tareas.crear',
+                        path: 'crear',
+                        component: () => import('../views/CrearTarea.vue'),
+                        meta: { breadCrumb: 'Crear Tarea' }
+                    },
+                ]
+            }
         ]
     },
     {

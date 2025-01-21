@@ -44,6 +44,14 @@ const model = ref([
         ]
     },
     {
+        label: 'Tareas',
+        items: [
+            { label: 'Mis Tareas', icon: 'pi pi-fw pi-id-card', to: '/admin/tareas/usuario', permision: 'all' },
+            { label: 'Tareas Globales', icon: 'pi pi-fw pi-check-square', to: '/admin/tareas/generales', permision: 'all' },
+            { label: 'Crear Tarea', icon: 'pi pi-fw pi-bookmark', to: '/admin/tareas/crear', permision: 'all' }
+        ]
+    },
+    {
         label: 'Posts',
         items: [
             { label: 'Posts', icon: 'pi pi-fw pi-id-card', to: '/admin/posts', permision: 'post-list' },

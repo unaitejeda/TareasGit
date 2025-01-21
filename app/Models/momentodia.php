@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class MomentoDia extends Model
 {
     use HasFactory;
+    protected $table = 'momentodia'; 
 
     /**
      * Los atributos que se pueden asignar de manera masiva.

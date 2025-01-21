@@ -9,6 +9,13 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+// use App\Http\Controllers\Api\UsuariosController;
+use App\Http\Controllers\Api\LugaresController;
+use App\Http\Controllers\Api\TiposController;
+use App\Http\Controllers\Api\TareasController;
+use App\Http\Controllers\Api\MomentodiaController;
+use App\Http\Controllers\Api\EstadosController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -51,3 +58,30 @@ Route::get('category-list', [CategoryController::class, 'getList']);
 Route::get('get-posts', [PostControllerAdvance::class, 'getPosts']);
 Route::get('get-category-posts/{id}', [PostControllerAdvance::class, 'getCategoryByPosts']);
 Route::get('get-post/{id}', [PostControllerAdvance::class, 'getPost']);
+
+
+// Route::post('/register', [UsuariosController::class, 'register']);
+// Route::post('/login', [UsuariosController::class, 'login']);
+// Route::middleware('auth:sanctum')->group(function () {
+//     Route::post('/logout', [UsuariosController::class, 'logout']);
+//     Route::get('/me', [UsuariosController::class, 'me']);
+// });
+
+Route::group(['middleware' => 'auth:sanctum'], function() {
+    Route::apiResource('lugares', LugaresController::class);
+    Route::apiResource('tipos', TiposController::class);
+    Route::apiResource('tareas', TareasController::class);
+    Route::apiResource('momentodia', MomentodiaController::class);
+    Route::apiResource('estados', EstadosController::class);
+});
+
+// api.php
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('tareas-usuario', [TareasController::class, 'getTareasUsuario']);
+    Route::get('tareas-generales', [TareasController::class, 'getTareasGenerales']);
+    Route::post('tareas', action: [TareasController::class, 'store']);
+
+
+    Route::get('estados', [EstadosController::class, 'index']);
+    Route::get('momentodia', [MomentodiaController::class, 'index']);
+});
