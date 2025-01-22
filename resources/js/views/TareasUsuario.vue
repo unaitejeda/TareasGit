@@ -6,6 +6,10 @@
         <div>
           <h3>{{ tarea.tarea }}</h3>
           <p>{{ tarea.descripcion }}</p>
+          <p>Estado: {{ tarea.estado }}</p>
+          <button v-if="tarea.estado === 'programada'" @click="finalizarTarea(tarea.id)">
+            Marcar como finalizada
+          </button>
         </div>
       </li>
     </ul>
@@ -30,14 +34,20 @@ export default {
       try {
         const response = await axios.get('/api/tareas-usuario');
         this.tareas = response.data;
-
-        if (this.tareas.length > 0 && this.tareas[0].user) {
-          this.userName = this.tareas[0].user.name; // Mostrar nombre del usuario si está disponible
-        } else {
-          this.userName = 'Usuario desconocido'; // Valor predeterminado si no hay datos del usuario
+        if (this.tareas.length > 0) {
+          this.userName = this.tareas[0].user.name;
         }
       } catch (error) {
         console.error('Error al obtener las tareas', error);
+      }
+    },
+    async finalizarTarea(id) {
+      try {
+        await axios.put(`/api/tareas/finalizar/${id}`);
+        const tarea = this.tareas.find(t => t.id === id);
+        if (tarea) tarea.estado = 'finalizada';
+      } catch (error) {
+        console.error('Error al finalizar la tarea', error);
       }
     },
   },

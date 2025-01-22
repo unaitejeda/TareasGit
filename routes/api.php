@@ -79,6 +79,8 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('tareas-usuario', [TareasController::class, 'getTareasUsuario']);
     Route::get('tareas-generales', [TareasController::class, 'getTareasGenerales']);
+    Route::put('tareas/finalizar/{id}', [TareasController::class, 'finalizarTarea']);
+
     Route::post('tareas', action: [TareasController::class, 'store']);
 
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\tareas;
+use App\Models\estados;
 
 class TareasController extends Controller
 {
@@ -20,22 +21,22 @@ class TareasController extends Controller
      * Almacenar una nueva tarea.
      */
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'tarea' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'fecha' => 'required|date',
-            'idlugar' => 'nullable|exists:lugares,id',
-            'idmomento' => 'nullable|exists:momentodia,id',
-            'idtipo' => 'nullable|exists:tipos,id',
-            'idestado' => 'nullable|exists:estados,id',
-        ]);
+{
+    $validated = $request->validate([
+        'tarea' => 'required|string|max:255',
+        'descripcion' => 'nullable|string',
+        'fecha' => 'required|date',
+        'idlugar' => 'nullable|exists:lugares,id',
+        'idmomento' => 'nullable|exists:momentodia,id',
+        'idtipo' => 'nullable|exists:tipos,id',
+    ]);
 
-        // Asignar el user_id al usuario autenticado
-        $validated['user_id'] = $request->user()->id;
+    $validated['user_id'] = $request->user()->id;
+    $validated['idestado'] = Estados::where('nombre', 'programada')->value('id'); // Establecer estado "programada"
 
-        return Tareas::create($validated);
-    }
+    return Tareas::create($validated);
+}
+
 
 
     /**
@@ -95,8 +96,9 @@ class TareasController extends Controller
         try {
             // Obtener las tareas del usuario autenticado con la relación de usuario
             $tareas = Tareas::where('user_id', $request->user()->id)
-                            ->with('user') // Asegúrate de que la relación 'user' esté definida en el modelo Tareas
-                            ->get();
+                ->with(['estado', 'user'])
+                ->get();
+
     
             // Verificar si hay tareas
             if ($tareas->isEmpty()) {
@@ -109,5 +111,23 @@ class TareasController extends Controller
         }
     }
     
+    public function finalizarTarea($id)
+{
+    try {
+        $tarea = Tareas::findOrFail($id);
+
+        if ($tarea->idestado != Estados::where('nombre', 'programada')->value('id')) {
+            return response()->json(['message' => 'La tarea no está en estado programada.'], 400);
+        }
+
+        $tarea->idestado = Estados::where('nombre', 'finalizada')->value('id');
+        $tarea->save();
+
+        return response()->json(['message' => 'Tarea finalizada correctamente.']);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Error al finalizar la tarea.'], 500);
+    }
+}
+
 
 }
