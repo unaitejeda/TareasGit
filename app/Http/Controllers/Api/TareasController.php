@@ -21,22 +21,23 @@ class TareasController extends Controller
      * Almacenar una nueva tarea.
      */
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'tarea' => 'required|string|max:255',
-        'descripcion' => 'nullable|string',
-        'fecha' => 'required|date',
-        'idlugar' => 'nullable|exists:lugares,id',
-        'idmomento' => 'nullable|exists:momentodia,id',
-        'idtipo' => 'nullable|exists:tipos,id',
-    ]);
-
-    $validated['user_id'] = $request->user()->id;
-    $validated['idestado'] = Estados::where('nombre', 'programada')->value('id'); // Establecer estado "programada"
-
-    return Tareas::create($validated);
-}
-
+    {
+        $validated = $request->validate([
+            'tarea' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'fecha' => 'required|date',
+            'idlugar' => 'nullable|exists:lugares,id',
+            'idmomento' => 'nullable|exists:momentodia,id',
+            'idtipo' => 'nullable|exists:tipos,id',
+        ]);
+    
+        // Añadimos el ID del usuario autenticado y el estado predeterminado
+        $validated['user_id'] = $request->user()->id;
+        $validated['idestado'] = Estados::where('estado', 'programada')->value('id'); // Estado por defecto
+    
+        return Tareas::create($validated);
+    }
+    
 
 
     /**
@@ -82,14 +83,24 @@ class TareasController extends Controller
     public function getTareasGenerales()
     {
         try {
-            // Obtiene todas las tareas generales de la base de datos
-            $tareas = tareas::all();  // Ajusta según sea necesario
-            return response()->json($tareas);
+            // Obtiene todas las tareas generales con sus relaciones
+            $tareas = Tareas::with(['estado', 'user'])->get(); // Incluye 'usuario' además de 'estado'
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Tareas generales obtenidas con éxito',
+                'data' => $tareas
+            ]);
         } catch (\Exception $e) {
             // Maneja errores si algo falla
-            return response()->json(['message' => 'Error al obtener las tareas'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener las tareas',
+                'error' => $e->getMessage() // Devuelve el error para más contexto en desarrollo
+            ], 500);
         }
     }
+    
 
     public function getTareasUsuario(Request $request)
     {
@@ -116,11 +127,11 @@ class TareasController extends Controller
     try {
         $tarea = Tareas::findOrFail($id);
 
-        if ($tarea->idestado != Estados::where('nombre', 'programada')->value('id')) {
+        if ($tarea->idestado != Estados::where('estado', 'programada')->value('id')) {
             return response()->json(['message' => 'La tarea no está en estado programada.'], 400);
         }
 
-        $tarea->idestado = Estados::where('nombre', 'finalizada')->value('id');
+        $tarea->idestado = Estados::where('estado', 'finalizada')->value('id');
         $tarea->save();
 
         return response()->json(['message' => 'Tarea finalizada correctamente.']);
