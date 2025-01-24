@@ -62,12 +62,11 @@ class TareasController extends Controller
             'idlugar' => 'nullable|exists:lugares,id',
             'idmomento' => 'nullable|exists:momentodia,id',
             'idtipo' => 'nullable|exists:tipos,id',
-            'idestado' => 'nullable|exists:estados,id',
         ]);
 
         $tarea->update($validated);
 
-        return $tarea;
+        return response()->json(['message' => 'Tarea actualizada con éxito.', 'tarea' => $tarea]);
     }
 
     /**

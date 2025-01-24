@@ -46,9 +46,9 @@ const model = ref([
     {
         label: 'Tareas',
         items: [
-            { label: 'Mis Tareas', icon: 'pi pi-fw pi-id-card', to: '/admin/tareas/usuario', permision: 'all' },
-            { label: 'Tareas Globales', icon: 'pi pi-fw pi-check-square', to: '/admin/tareas/generales', permision: 'all' },
-            { label: 'Crear Tarea', icon: 'pi pi-fw pi-bookmark', to: '/admin/tareas/crear', permision: 'all' }
+            { label: 'Mis Tareas', icon: 'pi pi-fw pi-id-card', to: '/tareas/usuario', permision: 'all' },
+            { label: 'Tareas Globales', icon: 'pi pi-fw pi-check-square', to: '/tareas/generales', permision: 'all' },
+            { label: 'Crear Tarea', icon: 'pi pi-fw pi-bookmark', to: '/tareas/crear', permision: 'all' }
         ]
     },
     {

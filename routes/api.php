@@ -80,6 +80,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('tareas-usuario', [TareasController::class, 'getTareasUsuario']);
     Route::get('tareas-generales', [TareasController::class, 'getTareasGenerales']);
     Route::put('tareas/finalizar/{id}', [TareasController::class, 'finalizarTarea']);
+    Route::delete('tareas/{id}', [TareasController::class, 'destroy']);
+    Route::put('tareas/{id}', [TareasController::class, 'update']);
 
     Route::post('tareas', action: [TareasController::class, 'store']);
 
