@@ -1,12 +1,42 @@
 <template>
   <div class="tasks-container">
     <h1 class="title">Mis Tareas</h1>
-    <div v-if="tareas.length === 0" class="empty-message">No tienes tareas.</div>
+
+    <!-- Filtros -->
+    <div class="filters">
+      <div class="filter-group">
+        <label for="estado">Estado:</label>
+        <select id="estado" v-model="filtros.estado" @change="guardarFiltros">
+          <option value="">Todos</option>
+          <option value="programada">Programada</option>
+          <option value="finalizada">Finalizada</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="busqueda">Búsqueda:</label>
+        <input
+          id="busqueda"
+          type="text"
+          placeholder="Buscar por título o descripción"
+          v-model="filtros.busqueda"
+          @input="guardarFiltros"
+        />
+      </div>
+    </div>
+
+    <div v-if="tareasFiltradas.length === 0" class="empty-message">
+      No se encontraron tareas con los filtros seleccionados.
+    </div>
     <div v-else class="tasks-grid">
-      <div class="task-card" v-for="tarea in tareas" :key="tarea.id">
+      <div class="task-card" v-for="tarea in tareasFiltradas" :key="tarea.id">
         <h2 class="task-title">{{ tarea.tarea }}</h2>
         <p class="task-description">{{ tarea.descripcion }}</p>
-        <p class="task-status">Estado: <span :class="'status-' + tarea.estado.estado.toLowerCase()">{{ tarea.estado.estado }}</span></p>
+        <p class="task-status">
+          Estado: 
+          <span :class="'status-' + tarea.estado.estado.toLowerCase()">
+            {{ tarea.estado.estado }}
+          </span>
+        </p>
 
         <button
           v-if="tarea.estado.estado === 'programada'"
@@ -16,17 +46,11 @@
           Finalizar Tarea
         </button>
 
-        <button
-          @click="eliminarTarea(tarea.id)"
-          class="btn-danger"
-        >
+        <button @click="eliminarTarea(tarea.id)" class="btn-danger">
           Eliminar Tarea
         </button>
 
-        <button
-          @click="abrirModalEditar(tarea)"
-          class="btn-warning"
-        >
+        <button @click="abrirModalEditar(tarea)" class="btn-warning">
           Editar Tarea
         </button>
       </div>
@@ -67,10 +91,36 @@ export default {
     return {
       tareas: [],
       mostrarModal: false,
-      tareaSeleccionada: null, // Tarea actualmente seleccionada para editar
+      tareaSeleccionada: null,
+      filtros: {
+        estado: "",
+        busqueda: "",
+      },
     };
   },
+  computed: {
+    tareasFiltradas() {
+      return this.tareas
+        .filter((tarea) => {
+          if (this.filtros.estado) {
+            return tarea.estado.estado.toLowerCase() === this.filtros.estado;
+          }
+          return true;
+        })
+        .filter((tarea) => {
+          if (this.filtros.busqueda) {
+            const texto = this.filtros.busqueda.toLowerCase();
+            return (
+              tarea.tarea.toLowerCase().includes(texto) ||
+              tarea.descripcion.toLowerCase().includes(texto)
+            );
+          }
+          return true;
+        });
+    },
+  },
   created() {
+    this.cargarFiltros();
     this.cargarTareas();
   },
   methods: {
@@ -80,6 +130,15 @@ export default {
         this.tareas = response.data;
       } catch (error) {
         console.error("Error al cargar las tareas:", error);
+      }
+    },
+    guardarFiltros() {
+      localStorage.setItem("filtrosTareas", JSON.stringify(this.filtros));
+    },
+    cargarFiltros() {
+      const filtrosGuardados = localStorage.getItem("filtrosTareas");
+      if (filtrosGuardados) {
+        this.filtros = JSON.parse(filtrosGuardados);
       }
     },
     async finalizarTarea(id) {
@@ -103,7 +162,7 @@ export default {
       }
     },
     abrirModalEditar(tarea) {
-      this.tareaSeleccionada = { ...tarea }; // Clonar la tarea para no modificar directamente
+      this.tareaSeleccionada = { ...tarea };
       this.mostrarModal = true;
     },
     cerrarModal() {
@@ -230,5 +289,16 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-top: 15px;
+}
+
+.filters {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.filter-group {
+  display: flex;
+  flex-direction: column;
 }
 </style>
