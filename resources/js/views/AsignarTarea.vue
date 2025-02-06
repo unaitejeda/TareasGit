@@ -29,7 +29,7 @@
                         {{ lugar.lugar }}
                     </option>
                 </select>
-            </div>
+            </div> 
             <div class="campo">
                 <label for="idmomento">Momento del día</label>
                 <select v-model="tarea.idmomento" id="idmomento">
@@ -128,5 +128,58 @@ export default {
 </script>
 
 <style scoped>
-/* Aquí puedes añadir estilos similares a los de la otra vista */
+.formulario-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.titulo {
+  text-align: center;
+  font-size: 2rem; /* Igual al tamaño de título de crearTareas */
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+}
+
+.campo label {
+  margin-bottom: 0.5rem;
+  font-weight: bold; /* Igual a la otra vista */
+}
+
+.campo input,
+.campo textarea,
+.campo select {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.btn-crear {
+  padding: 0.8rem 1.5rem;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.btn-crear:hover {
+  background: #43a047;
+}
 </style>

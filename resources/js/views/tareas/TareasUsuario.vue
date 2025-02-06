@@ -62,6 +62,31 @@
           Editar Tarea
         </button>
       </div>
+
+      <!-- Modal para editar tarea -->
+    <div v-if="mostrarModal" class="modal-overlay">
+      <div class="modal-content">
+        <h2>Editar Tarea</h2>
+        <form @submit.prevent="actualizarTarea">
+          <div class="form-group">
+            <label for="tarea">Título</label>
+            <input id="tarea" v-model="tareaSeleccionada.tarea" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" v-model="tareaSeleccionada.descripcion"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="fecha">Fecha</label>
+            <input id="fecha" v-model="tareaSeleccionada.fecha" type="date" required />
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn-success">Guardar</button>
+            <button type="button" @click="cerrarModal" class="btn-danger">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
     </div>
   </div>
 </template>
