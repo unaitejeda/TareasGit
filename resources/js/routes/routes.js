@@ -149,10 +149,6 @@ export default [
     {
         path: '/admin',
         component: AuthenticatedLayout,
-        // redirect: {
-        //     name: 'admin.index'
-        // },
-        // beforeEnter: requireAdmin,
         meta: { breadCrumb: 'Dashboard' },
         children: [
             {
@@ -277,6 +273,16 @@ export default [
                         }
                     }
                 ]
+            },
+            {
+                path: '/admin/tareas/asignar',
+                name: 'tareas.asignar',
+                component: () => import('../views/AsignarTarea.vue'),
+                meta: { requiresAuth: true },
+                // beforeEnter: requireAdmin,
+                // redirect: {
+                //     name: 'tareas.usuario'
+                // },
             },
 
             //TODO Organizar rutas

@@ -2,7 +2,10 @@
   <div class="tasks-container">
     <h1 class="title">Mis Tareas</h1>
 
-    <!-- Filtros -->
+    <div v-if="location">
+      <p>Ubicación detectada: {{ location.city }}, {{ location.country_name }}</p>
+    </div>
+
     <div class="filters">
       <div class="filter-group">
         <label for="estado">Estado:</label>
@@ -38,6 +41,11 @@
           </span>
         </p>
 
+        <!-- Mostrar ubicación de la tarea -->
+        <p class="task-location">
+          📍 Creada en: {{ tarea.ubicacion || "Ubicación no disponible" }}
+        </p>
+
         <button
           v-if="tarea.estado.estado === 'programada'"
           @click="finalizarTarea(tarea.id)"
@@ -55,36 +63,12 @@
         </button>
       </div>
     </div>
-
-    <!-- Modal para editar tarea -->
-    <div v-if="mostrarModal" class="modal-overlay">
-      <div class="modal-content">
-        <h2>Editar Tarea</h2>
-        <form @submit.prevent="actualizarTarea">
-          <div class="form-group">
-            <label for="tarea">Título</label>
-            <input id="tarea" v-model="tareaSeleccionada.tarea" type="text" required />
-          </div>
-          <div class="form-group">
-            <label for="descripcion">Descripción</label>
-            <textarea id="descripcion" v-model="tareaSeleccionada.descripcion"></textarea>
-          </div>
-          <div class="form-group">
-            <label for="fecha">Fecha</label>
-            <input id="fecha" v-model="tareaSeleccionada.fecha" type="date" required />
-          </div>
-          <div class="modal-actions">
-            <button type="submit" class="btn-success">Guardar</button>
-            <button type="button" @click="cerrarModal" class="btn-danger">Cancelar</button>
-          </div>
-        </form>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import GeolocationService from '/services/GeolocationService'; // Importar el servicio
 
 export default {
   data() {
@@ -96,6 +80,7 @@ export default {
         estado: "",
         busqueda: "",
       },
+      location: null, // Para guardar la ubicación del usuario
     };
   },
   computed: {
@@ -122,6 +107,7 @@ export default {
   created() {
     this.cargarFiltros();
     this.cargarTareas();
+    this.obtenerUbicacion(); // Llamar al método para obtener la ubicación
   },
   methods: {
     async cargarTareas() {
@@ -181,6 +167,14 @@ export default {
         alert("Hubo un error al actualizar la tarea.");
       }
     },
+    async obtenerUbicacion() {
+      try {
+        const data = await GeolocationService.getLocation();
+        this.location = data;
+      } catch (error) {
+        console.error("No se pudo obtener la ubicación:", error);
+      }
+    }
   },
 };
 </script>
@@ -300,5 +294,11 @@ export default {
 .filter-group {
   display: flex;
   flex-direction: column;
+}
+
+.task-location {
+  font-size: 0.9rem;
+  color: #555;
+  font-style: italic;
 }
 </style>

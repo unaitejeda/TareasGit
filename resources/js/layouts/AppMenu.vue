@@ -33,20 +33,21 @@ const model = ref([
     {
         label: 'Home',
         permision: 'all',
-        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/admin', permision: 'all'}]
+        items: [{ label: 'Dashboard', icon: 'pi pi-fw ', to: '/admin', permision: 'all'}]
     },
     {
         label: 'Usuarios',
         items: [
             { label: 'Users', icon: 'pi pi-fw pi-id-card', to: '/admin/users', permision: 'user-list' },
             { label: 'Roles', icon: 'pi pi-fw pi-check-square', to: '/admin/roles', permision:'role-list' },
-            { label: 'Permisos', icon: 'pi pi-fw pi-bookmark', to: '/admin/permissions', permision:'permission-list' }
+            { label: 'Permisos', icon: 'pi pi-fw pi-bookmark', to: '/admin/permissions', permision:'permission-list' },
+            { label: 'Asignar Tareas', icon: 'pi pi-fw pi-id-card', to: '/admin/tareas/asignar', permision: 'user-list' }
         ]
     },
     {
         label: 'Tareas',
         items: [
-            { label: 'Mis Tareas', icon: 'pi pi-fw pi-id-card', to: '/tareas/usuario', permision: 'all' },
+            { label: 'Mis Tareas', icon: 'pi pi-fw pi-home', to: '/tareas/usuario', permision: 'all' },
             { label: 'Tareas Globales', icon: 'pi pi-fw pi-check-square', to: '/tareas/generales', permision: 'all' },
             { label: 'Crear Tarea', icon: 'pi pi-fw pi-bookmark', to: '/tareas/crear', permision: 'all' }
         ]

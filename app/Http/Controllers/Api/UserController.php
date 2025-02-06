@@ -126,4 +126,13 @@ class UserController extends Controller
     }
 
 
+    public function getUsers()
+    {
+        try {
+            $users = User::all();
+            return response()->json($users);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener los usuarios'], 500);
+        }
+    }
 }

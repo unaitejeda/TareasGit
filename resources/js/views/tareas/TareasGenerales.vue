@@ -4,19 +4,10 @@
 
     <!-- Filtros -->
     <div class="filtros">
-      <input
-        type="text"
-        v-model="searchQuery"
-        @input="guardarFiltros"
-        placeholder="Buscar por título"
-      />
+      <input type="text" v-model="searchQuery" @input="guardarFiltros" placeholder="Buscar por título" />
       <select v-model="filtroInicialUsuario" @change="guardarFiltros">
         <option value="">Todas las iniciales</option>
-        <option
-          v-for="inicial in inicialesUsuarios"
-          :key="inicial"
-          :value="inicial"
-        >
+        <option v-for="inicial in inicialesUsuarios" :key="inicial" :value="inicial">
           {{ inicial }}
         </option>
       </select>
@@ -27,17 +18,19 @@
     </div>
 
     <!-- Tabla de tareas -->
-    <div class="tabla-tareas" v-else>
-      <div class="fila-tarea encabezado">
-        <span class="columna">Título</span>
-        <span class="columna">Descripción</span>
-        <span class="columna">Usuario</span>
-      </div>
-      <div v-for="tarea in tareasFiltradas" :key="tarea.id" class="fila-tarea">
-        <span class="columna">{{ tarea.tarea }}</span>
-        <span class="columna">{{ tarea.descripcion }}</span>
-        <span class="columna">{{ tarea.user ? tarea.user.name : "Sin asignar" }}</span>
-      </div>
+    <div class="fila-tarea encabezado">
+      <span class="columna">Título</span>
+      <span class="columna">Descripción</span>
+      <span class="columna">Usuario</span>
+      <span class="columna">Ubicación</span> <!-- Nueva columna -->
+    </div>
+    <div v-for="tarea in tareasFiltradas" :key="tarea.id" class="fila-tarea">
+      <span class="columna">{{ tarea.tarea }}</span>
+      <span class="columna">{{ tarea.descripcion }}</span>
+      <span class="columna">{{ tarea.user ? tarea.user.name : "Sin asignar" }}</span>
+      <span class="columna">
+        {{ tarea.ubicacion ? tarea.ubicacion : "Ubicación no disponible" }}
+      </span>
     </div>
 
     <!-- Resumen con reduce -->
@@ -153,31 +146,37 @@ export default {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
 .titulo {
   text-align: center;
   font-size: 2rem;
   color: #333;
   margin-bottom: 1.5rem;
 }
+
 .filtros {
   display: flex;
   justify-content: space-between;
   margin-bottom: 1rem;
 }
+
 .filtros input,
 .filtros select {
   padding: 0.5rem;
   font-size: 1rem;
 }
+
 .no-tareas {
   text-align: center;
   font-size: 1.2rem;
   color: #777;
 }
+
 .tabla-tareas {
   display: grid;
   gap: 1rem;
 }
+
 .fila-tarea {
   display: grid;
   grid-template-columns: 2fr 4fr 1fr;
@@ -187,17 +186,30 @@ export default {
   border-radius: 5px;
   align-items: center;
 }
+
 .fila-tarea.encabezado {
   background: #333;
   color: #ffffff;
   font-weight: bold;
 }
+
 .columna {
   text-align: left;
   padding: 0 0.5rem;
 }
+
 .resumen-tareas {
   margin-top: 1.5rem;
   text-align: center;
+}
+
+.fila-tarea {
+  display: grid;
+  grid-template-columns: 2fr 4fr 1fr 2fr; /* Agregamos espacio para la ubicación */
+  padding: 0.8rem;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  align-items: center;
 }
 </style>

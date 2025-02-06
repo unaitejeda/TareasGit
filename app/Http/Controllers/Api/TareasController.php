@@ -29,15 +29,16 @@ class TareasController extends Controller
             'idlugar' => 'nullable|exists:lugares,id',
             'idmomento' => 'nullable|exists:momentodia,id',
             'idtipo' => 'nullable|exists:tipos,id',
+            'ubicacion' => 'nullable|string|max:255' // Nueva validación para la ubicación
         ]);
-    
+
         // Añadimos el ID del usuario autenticado y el estado predeterminado
         $validated['user_id'] = $request->user()->id;
         $validated['idestado'] = Estados::where('estado', 'programada')->value('id'); // Estado por defecto
-    
+
         return Tareas::create($validated);
     }
-    
+
 
 
     /**
@@ -82,24 +83,23 @@ class TareasController extends Controller
     public function getTareasGenerales()
     {
         try {
-            // Obtiene todas las tareas generales con sus relaciones
-            $tareas = Tareas::with(['estado', 'user'])->get(); // Incluye 'usuario' además de 'estado'
-    
+            // Obtiene todas las tareas con la ubicación incluida
+            $tareas = Tareas::with(['estado', 'user'])->get(['id', 'tarea', 'descripcion', 'fecha', 'ubicacion', 'idestado', 'user_id']);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Tareas generales obtenidas con éxito',
                 'data' => $tareas
             ]);
         } catch (\Exception $e) {
-            // Maneja errores si algo falla
             return response()->json([
                 'success' => false,
                 'message' => 'Error al obtener las tareas',
-                'error' => $e->getMessage() // Devuelve el error para más contexto en desarrollo
+                'error' => $e->getMessage()
             ], 500);
         }
     }
-    
+
 
     public function getTareasUsuario(Request $request)
     {
@@ -109,35 +109,52 @@ class TareasController extends Controller
                 ->with(['estado', 'user'])
                 ->get();
 
-    
+
             // Verificar si hay tareas
             if ($tareas->isEmpty()) {
                 return response()->json(['message' => 'No se encontraron tareas para este usuario.'], 404);
             }
-    
+
             return response()->json($tareas);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error al obtener las tareas'], 500);
         }
     }
-    
+
     public function finalizarTarea($id)
-{
-    try {
-        $tarea = Tareas::findOrFail($id);
+    {
+        try {
+            $tarea = Tareas::findOrFail($id);
 
-        if ($tarea->idestado != Estados::where('estado', 'programada')->value('id')) {
-            return response()->json(['message' => 'La tarea no está en estado programada.'], 400);
+            if ($tarea->idestado != Estados::where('estado', 'programada')->value('id')) {
+                return response()->json(['message' => 'La tarea no está en estado programada.'], 400);
+            }
+
+            $tarea->idestado = Estados::where('estado', 'finalizada')->value('id');
+            $tarea->save();
+
+            return response()->json(['message' => 'Tarea finalizada correctamente.']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al finalizar la tarea.'], 500);
         }
-
-        $tarea->idestado = Estados::where('estado', 'finalizada')->value('id');
-        $tarea->save();
-
-        return response()->json(['message' => 'Tarea finalizada correctamente.']);
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Error al finalizar la tarea.'], 500);
     }
+
+
+    public function asignarTarea(Request $request)
+{
+    $validated = $request->validate([
+        'tarea' => 'required|string|max:255',
+        'descripcion' => 'nullable|string',
+        'fecha' => 'required|date',
+        'idlugar' => 'nullable|exists:lugares,id',
+        'idmomento' => 'nullable|exists:momentodia,id',
+        'idtipo' => 'nullable|exists:tipos,id',
+        'ubicacion' => 'nullable|string|max:255',
+        'user_id' => 'required|exists:users,id' // Se asigna a un usuario específico
+    ]);
+
+    $validated['idestado'] = Estados::where('estado', 'programada')->value('id');
+
+    return Tareas::create($validated);
 }
-
-
 }

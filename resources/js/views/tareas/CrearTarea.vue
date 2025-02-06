@@ -45,6 +45,7 @@
 
 <script>
 import axios from "axios";
+import GeolocationService from '/services/GeolocationService';
 
 export default {
   data() {
@@ -56,6 +57,7 @@ export default {
         idlugar: null,
         idmomento: null,
         idtipo: null,
+        ubicacion: "", // Se añade la propiedad ubicacion
       },
       lugares: [],
       momentos: [],
@@ -64,6 +66,7 @@ export default {
   },
   created() {
     this.fetchData();
+    this.getUbicacion();
   },
   methods: {
     async fetchData() {
@@ -78,6 +81,23 @@ export default {
         this.tipos = tipos.data;
       } catch (error) {
         console.error("Error al obtener datos", error);
+      }
+    },
+    async getUbicacion() {
+      try {
+        const locationData = await GeolocationService.getLocation();
+
+        // Comprobar qué datos están disponibles y asignar la ciudad
+        const city = locationData.city || locationData.district || "Ubicación desconocida";
+        const state = locationData.state_prov || "Provincia desconocida";
+        const country = locationData.country_name || "País desconocido";
+
+        // Combinamos ciudad, provincia y país
+        this.tarea.ubicacion = `${city}, ${state}, ${country}`;
+
+      } catch (error) {
+        this.tarea.ubicacion = "Ubicación no disponible";
+        console.warn("No se pudo obtener la ubicación", error);
       }
     },
     async submitTarea() {

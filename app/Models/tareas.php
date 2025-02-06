@@ -22,7 +22,8 @@ class tareas extends Model
         'idestado',
         'likes',
         'dislikes',
-        'user_id'
+        'user_id',
+        'ubicacion'
     ];
 
 

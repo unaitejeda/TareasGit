@@ -6,6 +6,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "google/apiclient": "^2.13",
+        "google/auth": "^1.10",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
@@ -13,6 +15,7 @@
         "laravel/ui": "^4.2",
         "orangehill/iseed": "^3.0",
         "rakutentech/laravel-request-docs": "^2.23",
+        "spatie/laravel-google-calendar": "^3.8",
         "spatie/laravel-medialibrary": "^10.13",
         "spatie/laravel-permission": "^5.10"
     },
