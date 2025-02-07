@@ -66,17 +66,17 @@ export default {
         idmomento: null,
         idtipo: null,
         ubicacion: "", 
-        user_id: null, // Añadimos el campo para el usuario
+        user_id: null,
       },
       lugares: [],
       momentos: [],
       tipos: [],
-      usuarios: [], // Aquí almacenamos los usuarios
+      usuarios: [],
     };
   },
   created() {
     this.fetchData();
-    this.fetchUsuarios(); // Traemos los usuarios
+    this.fetchUsuarios();
     this.getUbicacion();
   },
   methods: {
@@ -96,7 +96,7 @@ export default {
     },
     async fetchUsuarios() {
       try {
-        const response = await axios.get("/api/users"); // Cambiar la URL si es necesario
+        const response = await axios.get("/api/users");
         this.usuarios = response.data;
       } catch (error) {
         console.error("Error al obtener usuarios", error);
@@ -117,7 +117,7 @@ export default {
     },
     async crearTarea() {
       try {
-        await axios.post("/api/tareas-asignadas", this.tarea); // Cambiar la URL si es necesario
+        await axios.post("/api/tareas-asignadas", this.tarea);
         this.$router.push({ name: "tareas.generales" });
       } catch (error) {
         console.error("Error al asignar la tarea", error);
@@ -139,7 +139,7 @@ export default {
 
 .titulo {
   text-align: center;
-  font-size: 2rem; /* Igual al tamaño de título de crearTareas */
+  font-size: 2rem;
   color: #333;
   margin-bottom: 1.5rem;
 }
@@ -157,7 +157,7 @@ export default {
 
 .campo label {
   margin-bottom: 0.5rem;
-  font-weight: bold; /* Igual a la otra vista */
+  font-weight: bold;
 }
 
 .campo input,

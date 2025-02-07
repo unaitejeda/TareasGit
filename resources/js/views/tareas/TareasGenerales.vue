@@ -2,7 +2,6 @@
   <div class="tareas-container">
     <h1 class="titulo">Tareas Finalizadas</h1>
 
-    <!-- Filtros -->
     <div class="filtros">
       <input type="text" v-model="searchQuery" @input="guardarFiltros" placeholder="Buscar por título" />
       <select v-model="filtroInicialUsuario" @change="guardarFiltros">
@@ -17,12 +16,11 @@
       No hay tareas finalizadas disponibles.
     </div>
 
-    <!-- Tabla de tareas -->
     <div class="fila-tarea encabezado">
       <span class="columna">Título</span>
       <span class="columna">Descripción</span>
       <span class="columna">Usuario</span>
-      <span class="columna">Ubicación</span> <!-- Nueva columna -->
+      <span class="columna">Ubicación</span>
     </div>
     <div v-for="tarea in tareasFiltradas" :key="tarea.id" class="fila-tarea">
       <span class="columna">{{ tarea.tarea }}</span>
@@ -33,7 +31,6 @@
       </span>
     </div>
 
-    <!-- Resumen con reduce -->
     <div class="resumen-tareas" v-if="tareas.length > 0">
       <p>
         Total de tareas finalizadas: <strong>{{ totalTareas }}</strong>
@@ -48,22 +45,19 @@ import axios from "axios";
 export default {
   data() {
     return {
-      tareas: [], // Lista de tareas finalizadas
-      searchQuery: "", // Filtro de búsqueda
-      filtroInicialUsuario: "", // Filtro por inicial de usuario
+      tareas: [],
+      searchQuery: "",
+      filtroInicialUsuario: "",
     };
   },
   computed: {
-    // Filtrar las tareas según los criterios
     tareasFiltradas() {
       return this.tareas
         .filter((tarea) => {
-          // Filtro por búsqueda en el título
           const tituloIncluyeBusqueda = tarea.tarea
             .toLowerCase()
             .includes(this.searchQuery.toLowerCase());
 
-          // Filtro por inicial del usuario
           const inicialUsuario = tarea.user
             ? tarea.user.name[0].toUpperCase()
             : "";
@@ -74,7 +68,6 @@ export default {
           return tituloIncluyeBusqueda && cumpleInicial;
         })
         .map((tarea) => ({
-          // Aplicar map para modificar o enriquecer datos de la tarea
           ...tarea,
           descripcionResumida:
             tarea.descripcion.length > 50
@@ -82,16 +75,14 @@ export default {
               : tarea.descripcion,
         }));
     },
-    // Resumen usando reduce
     totalTareas() {
       return this.tareasFiltradas.reduce((total, tarea) => total + 1, 0);
     },
-    // Obtener todas las iniciales de los usuarios para el filtro
     inicialesUsuarios() {
       const iniciales = this.tareas
         .map((tarea) => (tarea.user ? tarea.user.name[0].toUpperCase() : ""))
-        .filter((inicial) => inicial !== ""); // Eliminar vacíos
-      return [...new Set(iniciales)]; // Eliminar duplicados
+        .filter((inicial) => inicial !== "");
+      return [...new Set(iniciales)];
     },
   },
   created() {
@@ -103,7 +94,6 @@ export default {
       try {
         const response = await axios.get("/api/tareas-generales");
         if (response.data.success) {
-          // Filtrar solo las tareas finalizadas
           this.tareas = response.data.data.filter(
             (tarea) => tarea.estado && tarea.estado.estado === "finalizada"
           );
@@ -113,7 +103,6 @@ export default {
       }
     },
     guardarFiltros() {
-      // Guardar los filtros en localStorage
       localStorage.setItem(
         "filtrosTareasGenerales",
         JSON.stringify({
@@ -123,7 +112,6 @@ export default {
       );
     },
     cargarFiltros() {
-      // Cargar los filtros desde localStorage
       const filtrosGuardados = localStorage.getItem("filtrosTareasGenerales");
       if (filtrosGuardados) {
         const { searchQuery, filtroInicialUsuario } = JSON.parse(

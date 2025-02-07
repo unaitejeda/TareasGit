@@ -48,7 +48,7 @@ async function requireAdmin(to, from, next) {
         if (hasAdmin(user.roles)) {
             next()
         } else {
-            next('/app')
+            next('/tareas')
         }
     } else {
         next('/login')
@@ -58,7 +58,6 @@ async function requireAdmin(to, from, next) {
 export default [
     {
         path: '/',
-        // redirect: { name: 'login' },
         component: GuestLayout,
         children: [
 
@@ -112,9 +111,6 @@ export default [
     {
         path: '/app',
         component: AuthenticatedUserLayout,
-        // redirect: {
-        //     name: 'admin.index'
-        // },
         name: 'app',
         beforeEnter: requireLogin,
         meta: { breadCrumb: 'Dashboard' }
@@ -148,6 +144,10 @@ export default [
 
     {
         path: '/admin',
+        beforeEnter: requireAdmin,
+        redirect: {
+            name: 'tareas.usuario'
+        },
         component: AuthenticatedLayout,
         meta: { breadCrumb: 'Dashboard' },
         children: [
@@ -156,6 +156,12 @@ export default [
                 path: '',
                 component: () => import('../views/admin/index.vue'),
                 meta: { breadCrumb: 'Admin' }
+            },
+            {
+                path: '/admin/tareas/asignar',
+                name: 'tareas.asignar',
+                component: () => import('../views/admin/AsignarTarea.vue'),
+                
             },
             {
                 name: 'profile.index',
@@ -274,18 +280,6 @@ export default [
                     }
                 ]
             },
-            {
-                path: '/admin/tareas/asignar',
-                name: 'tareas.asignar',
-                component: () => import('../views/AsignarTarea.vue'),
-                meta: { requiresAuth: true },
-                // beforeEnter: requireAdmin,
-                // redirect: {
-                //     name: 'tareas.usuario'
-                // },
-            },
-
-            //TODO Organizar rutas
             {
                 name: 'roles.index',
                 path: 'roles',

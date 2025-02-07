@@ -41,7 +41,6 @@
           </span>
         </p>
 
-        <!-- Mostrar ubicación de la tarea -->
         <p class="task-location">
           📍 Creada en: {{ tarea.ubicacion || "Ubicación no disponible" }}
         </p>
@@ -63,7 +62,6 @@
         </button>
       </div>
 
-      <!-- Modal para editar tarea -->
     <div v-if="mostrarModal" class="modal-overlay">
       <div class="modal-content">
         <h2>Editar Tarea</h2>
@@ -93,7 +91,7 @@
 
 <script>
 import axios from "axios";
-import GeolocationService from '/services/GeolocationService'; // Importar el servicio
+import GeolocationService from '/services/GeolocationService';
 
 export default {
   data() {
@@ -105,7 +103,7 @@ export default {
         estado: "",
         busqueda: "",
       },
-      location: null, // Para guardar la ubicación del usuario
+      location: null,
     };
   },
   computed: {
@@ -132,7 +130,7 @@ export default {
   created() {
     this.cargarFiltros();
     this.cargarTareas();
-    this.obtenerUbicacion(); // Llamar al método para obtener la ubicación
+    this.obtenerUbicacion();
   },
   methods: {
     async cargarTareas() {

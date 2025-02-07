@@ -9,17 +9,11 @@ use App\Models\estados;
 
 class TareasController extends Controller
 {
-    /**
-     * Mostrar una lista de las tareas.
-     */
     public function index()
     {
         return tareas::all();
     }
 
-    /**
-     * Almacenar una nueva tarea.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -29,29 +23,21 @@ class TareasController extends Controller
             'idlugar' => 'nullable|exists:lugares,id',
             'idmomento' => 'nullable|exists:momentodia,id',
             'idtipo' => 'nullable|exists:tipos,id',
-            'ubicacion' => 'nullable|string|max:255' // Nueva validación para la ubicación
+            'ubicacion' => 'nullable|string|max:255'
         ]);
 
-        // Añadimos el ID del usuario autenticado y el estado predeterminado
         $validated['user_id'] = $request->user()->id;
-        $validated['idestado'] = Estados::where('estado', 'programada')->value('id'); // Estado por defecto
+        $validated['idestado'] = Estados::where('estado', 'programada')->value('id');
 
         return Tareas::create($validated);
     }
 
 
-
-    /**
-     * Mostrar una tarea específica.
-     */
     public function show($id)
     {
         return tareas::findOrFail($id);
     }
 
-    /**
-     * Actualizar una tarea existente.
-     */
     public function update(Request $request, $id)
     {
         $tarea = tareas::findOrFail($id);
@@ -70,9 +56,7 @@ class TareasController extends Controller
         return response()->json(['message' => 'Tarea actualizada con éxito.', 'tarea' => $tarea]);
     }
 
-    /**
-     * Eliminar una tarea.
-     */
+
     public function destroy($id)
     {
         $tarea = tareas::findOrFail($id);
@@ -104,13 +88,11 @@ class TareasController extends Controller
     public function getTareasUsuario(Request $request)
     {
         try {
-            // Obtener las tareas del usuario autenticado con la relación de usuario
             $tareas = Tareas::where('user_id', $request->user()->id)
                 ->with(['estado', 'user'])
                 ->get();
 
 
-            // Verificar si hay tareas
             if ($tareas->isEmpty()) {
                 return response()->json(['message' => 'No se encontraron tareas para este usuario.'], 404);
             }
@@ -150,7 +132,7 @@ class TareasController extends Controller
         'idmomento' => 'nullable|exists:momentodia,id',
         'idtipo' => 'nullable|exists:tipos,id',
         'ubicacion' => 'nullable|string|max:255',
-        'user_id' => 'required|exists:users,id' // Se asigna a un usuario específico
+        'user_id' => 'required|exists:users,id'
     ]);
 
     $validated['idestado'] = Estados::where('estado', 'programada')->value('id');

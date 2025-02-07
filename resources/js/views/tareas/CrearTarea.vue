@@ -57,7 +57,7 @@ export default {
         idlugar: null,
         idmomento: null,
         idtipo: null,
-        ubicacion: "", // Se añade la propiedad ubicacion
+        ubicacion: "",
       },
       lugares: [],
       momentos: [],
@@ -87,12 +87,10 @@ export default {
       try {
         const locationData = await GeolocationService.getLocation();
 
-        // Comprobar qué datos están disponibles y asignar la ciudad
         const city = locationData.city || locationData.district || "Ubicación desconocida";
         const state = locationData.state_prov || "Provincia desconocida";
         const country = locationData.country_name || "País desconocido";
 
-        // Combinamos ciudad, provincia y país
         this.tarea.ubicacion = `${city}, ${state}, ${country}`;
 
       } catch (error) {
