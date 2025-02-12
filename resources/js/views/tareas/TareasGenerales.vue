@@ -40,87 +40,84 @@
 </template>
 
 <script>
+import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 
 export default {
-  data() {
-    return {
-      tareas: [],
-      searchQuery: "",
-      filtroInicialUsuario: "",
-    };
-  },
-  computed: {
-    tareasFiltradas() {
-      return this.tareas
-        .filter((tarea) => {
-          const tituloIncluyeBusqueda = tarea.tarea
-            .toLowerCase()
-            .includes(this.searchQuery.toLowerCase());
+  setup() {
+    const tareas = ref([]);
+    const searchQuery = ref("");
+    const filtroInicialUsuario = ref("");
 
-          const inicialUsuario = tarea.user
-            ? tarea.user.name[0].toUpperCase()
-            : "";
-          const cumpleInicial =
-            !this.filtroInicialUsuario ||
-            inicialUsuario === this.filtroInicialUsuario;
-
-          return tituloIncluyeBusqueda && cumpleInicial;
-        })
-        .map((tarea) => ({
-          ...tarea,
-          descripcionResumida:
-            tarea.descripcion.length > 50
-              ? tarea.descripcion.slice(0, 50) + "..."
-              : tarea.descripcion,
-        }));
-    },
-    totalTareas() {
-      return this.tareasFiltradas.reduce((total, tarea) => total + 1, 0);
-    },
-    inicialesUsuarios() {
-      const iniciales = this.tareas
-        .map((tarea) => (tarea.user ? tarea.user.name[0].toUpperCase() : ""))
-        .filter((inicial) => inicial !== "");
-      return [...new Set(iniciales)];
-    },
-  },
-  created() {
-    this.cargarFiltros();
-    this.fetchTareasGenerales();
-  },
-  methods: {
-    async fetchTareasGenerales() {
+    const fetchTareasGenerales = async () => {
       try {
         const response = await axios.get("/api/tareas-generales");
         if (response.data.success) {
-          this.tareas = response.data.data.filter(
+          tareas.value = response.data.data.filter(
             (tarea) => tarea.estado && tarea.estado.estado === "finalizada"
           );
         }
       } catch (error) {
         console.error("Error al obtener las tareas", error);
       }
-    },
-    guardarFiltros() {
+    };
+
+    const guardarFiltros = () => {
       localStorage.setItem(
         "filtrosTareasGenerales",
         JSON.stringify({
-          searchQuery: this.searchQuery,
-          filtroInicialUsuario: this.filtroInicialUsuario,
+          searchQuery: searchQuery.value,
+          filtroInicialUsuario: filtroInicialUsuario.value,
         })
       );
-    },
-    cargarFiltros() {
+    };
+
+    const cargarFiltros = () => {
       const filtrosGuardados = localStorage.getItem("filtrosTareasGenerales");
       if (filtrosGuardados) {
-        const { searchQuery, filtroInicialUsuario } = JSON.parse(
-          filtrosGuardados
-        );
-        this.searchQuery = searchQuery || "";
-        this.filtroInicialUsuario = filtroInicialUsuario || "";
+        const { searchQuery: query, filtroInicialUsuario: inicial } = JSON.parse(filtrosGuardados);
+        searchQuery.value = query || "";
+        filtroInicialUsuario.value = inicial || "";
       }
-    },
+    };
+
+    const tareasFiltradas = computed(() => {
+      return tareas.value
+        .filter((tarea) => {
+          const tituloIncluyeBusqueda = tarea.tarea.toLowerCase().includes(searchQuery.value.toLowerCase());
+          const inicialUsuario = tarea.user ? tarea.user.name[0].toUpperCase() : "";
+          const cumpleInicial = !filtroInicialUsuario.value || inicialUsuario === filtroInicialUsuario.value;
+          return tituloIncluyeBusqueda && cumpleInicial;
+        })
+        .map((tarea) => ({
+          ...tarea,
+          descripcionResumida: tarea.descripcion.length > 50 ? tarea.descripcion.slice(0, 50) + "..." : tarea.descripcion,
+        }));
+    });
+
+    const totalTareas = computed(() => tareasFiltradas.value.length);
+
+    const inicialesUsuarios = computed(() => {
+      const iniciales = tareas.value
+        .map((tarea) => (tarea.user ? tarea.user.name[0].toUpperCase() : ""))
+        .filter((inicial) => inicial !== "");
+      return [...new Set(iniciales)];
+    });
+
+    onMounted(() => {
+      cargarFiltros();
+      fetchTareasGenerales();
+    });
+
+    return {
+      tareas,
+      searchQuery,
+      filtroInicialUsuario,
+      tareasFiltradas,
+      totalTareas,
+      inicialesUsuarios,
+      guardarFiltros,
+    };
   },
 };
 </script>

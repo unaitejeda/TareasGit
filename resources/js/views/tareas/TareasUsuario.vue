@@ -45,11 +45,7 @@
           📍 Creada en: {{ tarea.ubicacion || "Ubicación no disponible" }}
         </p>
 
-        <button
-          v-if="tarea.estado.estado === 'programada'"
-          @click="finalizarTarea(tarea.id)"
-          class="btn-success"
-        >
+        <button v-if="tarea.estado.estado === 'programada'" @click="finalizarTarea(tarea.id)" class="btn-success">
           Finalizar Tarea
         </button>
 
@@ -62,144 +58,137 @@
         </button>
       </div>
 
-    <div v-if="mostrarModal" class="modal-overlay">
-      <div class="modal-content">
-        <h2>Editar Tarea</h2>
-        <form @submit.prevent="actualizarTarea">
-          <div class="form-group">
-            <label for="tarea">Título</label>
-            <input id="tarea" v-model="tareaSeleccionada.tarea" type="text" required />
-          </div>
-          <div class="form-group">
-            <label for="descripcion">Descripción</label>
-            <textarea id="descripcion" v-model="tareaSeleccionada.descripcion"></textarea>
-          </div>
-          <div class="form-group">
-            <label for="fecha">Fecha</label>
-            <input id="fecha" v-model="tareaSeleccionada.fecha" type="date" required />
-          </div>
-          <div class="modal-actions">
-            <button type="submit" class="btn-success">Guardar</button>
-            <button type="button" @click="cerrarModal" class="btn-danger">Cancelar</button>
-          </div>
-        </form>
+      <div v-if="mostrarModal" class="modal-overlay">
+        <div class="modal-content">
+          <h2>Editar Tarea</h2>
+          <form @submit.prevent="actualizarTarea">
+            <div class="form-group">
+              <label for="tarea">Título</label>
+              <input id="tarea" v-model="tareaSeleccionada.tarea" type="text" required />
+            </div>
+            <div class="form-group">
+              <label for="descripcion">Descripción</label>
+              <textarea id="descripcion" v-model="tareaSeleccionada.descripcion"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="fecha">Fecha</label>
+              <input id="fecha" v-model="tareaSeleccionada.fecha" type="date" required />
+            </div>
+            <div class="modal-actions">
+              <button type="submit" class="btn-success">Guardar</button>
+              <button type="button" @click="cerrarModal" class="btn-danger">Cancelar</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
     </div>
   </div>
 </template>
 
-<script>
-import axios from "axios";
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
 import GeolocationService from '/services/GeolocationService';
 
-export default {
-  data() {
-    return {
-      tareas: [],
-      mostrarModal: false,
-      tareaSeleccionada: null,
-      filtros: {
-        estado: "",
-        busqueda: "",
-      },
-      location: null,
-    };
-  },
-  computed: {
-    tareasFiltradas() {
-      return this.tareas
-        .filter((tarea) => {
-          if (this.filtros.estado) {
-            return tarea.estado.estado.toLowerCase() === this.filtros.estado;
-          }
-          return true;
-        })
-        .filter((tarea) => {
-          if (this.filtros.busqueda) {
-            const texto = this.filtros.busqueda.toLowerCase();
-            return (
-              tarea.tarea.toLowerCase().includes(texto) ||
-              tarea.descripcion.toLowerCase().includes(texto)
-            );
-          }
-          return true;
-        });
-    },
-  },
-  created() {
-    this.cargarFiltros();
-    this.cargarTareas();
-    this.obtenerUbicacion();
-  },
-  methods: {
-    async cargarTareas() {
-      try {
-        const response = await axios.get("/api/tareas-usuario");
-        this.tareas = response.data;
-      } catch (error) {
-        console.error("Error al cargar las tareas:", error);
-      }
-    },
-    guardarFiltros() {
-      localStorage.setItem("filtrosTareas", JSON.stringify(this.filtros));
-    },
-    cargarFiltros() {
-      const filtrosGuardados = localStorage.getItem("filtrosTareas");
-      if (filtrosGuardados) {
-        this.filtros = JSON.parse(filtrosGuardados);
-      }
-    },
-    async finalizarTarea(id) {
-      try {
-        await axios.put(`/api/tareas/finalizar/${id}`);
-        alert("La tarea se ha finalizado correctamente.");
-        this.cargarTareas();
-      } catch (error) {
-        console.error("Error al finalizar la tarea:", error);
-        alert("Hubo un error al finalizar la tarea.");
-      }
-    },
-    async eliminarTarea(id) {
-      try {
-        await axios.delete(`/api/tareas/${id}`);
-        alert("La tarea se ha eliminado correctamente.");
-        this.cargarTareas();
-      } catch (error) {
-        console.error("Error al eliminar la tarea:", error);
-        alert("Hubo un error al eliminar la tarea.");
-      }
-    },
-    abrirModalEditar(tarea) {
-      this.tareaSeleccionada = { ...tarea };
-      this.mostrarModal = true;
-    },
-    cerrarModal() {
-      this.mostrarModal = false;
-      this.tareaSeleccionada = null;
-    },
-    async actualizarTarea() {
-      try {
-        const { id, tarea, descripcion, fecha } = this.tareaSeleccionada;
-        await axios.put(`/api/tareas/${id}`, { tarea, descripcion, fecha });
-        alert("Tarea actualizada con éxito.");
-        this.cerrarModal();
-        this.cargarTareas();
-      } catch (error) {
-        console.error("Error al actualizar la tarea:", error);
-        alert("Hubo un error al actualizar la tarea.");
-      }
-    },
-    async obtenerUbicacion() {
-      try {
-        const data = await GeolocationService.getLocation();
-        this.location = data;
-      } catch (error) {
-        console.error("No se pudo obtener la ubicación:", error);
-      }
+const tareas = ref([]);
+const mostrarModal = ref(false);
+const tareaSeleccionada = ref(null);
+const filtros = ref({ estado: "", busqueda: "" });
+const location = ref(null);
+
+const tareasFiltradas = computed(() => {
+  return tareas.value.filter(tarea => {
+    if (filtros.value.estado) {
+      return tarea.estado.estado.toLowerCase() === filtros.value.estado;
     }
-  },
+    return true;
+  }).filter(tarea => {
+    if (filtros.value.busqueda) {
+      const texto = filtros.value.busqueda.toLowerCase();
+      return tarea.tarea.toLowerCase().includes(texto) || tarea.descripcion.toLowerCase().includes(texto);
+    }
+    return true;
+  });
+});
+
+const cargarTareas = async () => {
+  try {
+    const response = await axios.get("/api/tareas-usuario");
+    tareas.value = response.data;
+  } catch (error) {
+    console.error("Error al cargar las tareas:", error);
+  }
 };
+
+const guardarFiltros = () => {
+  localStorage.setItem("filtrosTareas", JSON.stringify(filtros.value));
+};
+
+const cargarFiltros = () => {
+  const filtrosGuardados = localStorage.getItem("filtrosTareas");
+  if (filtrosGuardados) {
+    filtros.value = JSON.parse(filtrosGuardados);
+  }
+};
+
+const finalizarTarea = async (id) => {
+  try {
+    await axios.put(`/api/tareas/finalizar/${id}`);
+    alert("La tarea se ha finalizado correctamente.");
+    cargarTareas();
+  } catch (error) {
+    console.error("Error al finalizar la tarea:", error);
+    alert("Hubo un error al finalizar la tarea.");
+  }
+};
+
+const eliminarTarea = async (id) => {
+  try {
+    await axios.delete(`/api/tareas/${id}`);
+    alert("La tarea se ha eliminado correctamente.");
+    cargarTareas();
+  } catch (error) {
+    console.error("Error al eliminar la tarea:", error);
+    alert("Hubo un error al eliminar la tarea.");
+  }
+};
+
+const abrirModalEditar = (tarea) => {
+  tareaSeleccionada.value = { ...tarea };
+  mostrarModal.value = true;
+};
+
+const cerrarModal = () => {
+  mostrarModal.value = false;
+  tareaSeleccionada.value = null;
+};
+
+const actualizarTarea = async () => {
+  try {
+    const { id, tarea, descripcion, fecha } = tareaSeleccionada.value;
+    await axios.put(`/api/tareas/${id}`, { tarea, descripcion, fecha });
+    alert("Tarea actualizada con éxito.");
+    cerrarModal();
+    cargarTareas();
+  } catch (error) {
+    console.error("Error al actualizar la tarea:", error);
+    alert("Hubo un error al actualizar la tarea.");
+  }
+};
+
+const obtenerUbicacion = async () => {
+  try {
+    location.value = await GeolocationService.getLocation();
+  } catch (error) {
+    console.error("No se pudo obtener la ubicación:", error);
+  }
+};
+
+onMounted(() => {
+  cargarFiltros();
+  cargarTareas();
+  obtenerUbicacion();
+});
 </script>
 
 <style scoped>

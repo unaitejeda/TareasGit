@@ -43,71 +43,71 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from "vue";
 import axios from "axios";
 import GeolocationService from '/services/GeolocationService';
+import { useRouter } from "vue-router";
 
-export default {
-  data() {
-    return {
-      tarea: {
-        tarea: "",
-        descripcion: "",
-        fecha: "",
-        idlugar: null,
-        idmomento: null,
-        idtipo: null,
-        ubicacion: "",
-      },
-      lugares: [],
-      momentos: [],
-      tipos: [],
-    };
-  },
-  created() {
-    this.fetchData();
-    this.getUbicacion();
-  },
-  methods: {
-    async fetchData() {
-      try {
-        const [lugares, momentos, tipos] = await Promise.all([
-          axios.get("/api/lugares"),
-          axios.get("/api/momentodia"),
-          axios.get("/api/tipos"),
-        ]);
-        this.lugares = lugares.data;
-        this.momentos = momentos.data;
-        this.tipos = tipos.data;
-      } catch (error) {
-        console.error("Error al obtener datos", error);
-      }
-    },
-    async getUbicacion() {
-      try {
-        const locationData = await GeolocationService.getLocation();
+const router = useRouter();
 
-        const city = locationData.city || locationData.district || "Ubicación desconocida";
-        const state = locationData.state_prov || "Provincia desconocida";
-        const country = locationData.country_name || "País desconocido";
+const tarea = ref({
+  tarea: "",
+  descripcion: "",
+  fecha: "",
+  idlugar: null,
+  idmomento: null,
+  idtipo: null,
+  ubicacion: "",
+});
 
-        this.tarea.ubicacion = `${city}, ${state}, ${country}`;
+const lugares = ref([]);
+const momentos = ref([]);
+const tipos = ref([]);
 
-      } catch (error) {
-        this.tarea.ubicacion = "Ubicación no disponible";
-        console.warn("No se pudo obtener la ubicación", error);
-      }
-    },
-    async submitTarea() {
-      try {
-        await axios.post("/api/tareas", this.tarea);
-        this.$router.push({ name: "tareas.generales" });
-      } catch (error) {
-        console.error("Error al crear la tarea", error);
-      }
-    },
-  },
+const fetchData = async () => {
+  try {
+    const [lugaresRes, momentosRes, tiposRes] = await Promise.all([
+      axios.get("/api/lugares"),
+      axios.get("/api/momentodia"),
+      axios.get("/api/tipos"),
+    ]);
+    lugares.value = lugaresRes.data;
+    momentos.value = momentosRes.data;
+    tipos.value = tiposRes.data;
+  } catch (error) {
+    console.error("Error al obtener datos", error);
+  }
 };
+
+const getUbicacion = async () => {
+  try {
+    const locationData = await GeolocationService.getLocation();
+
+    const city = locationData.city || locationData.district || "Ubicación desconocida";
+    const state = locationData.state_prov || "Provincia desconocida";
+    const country = locationData.country_name || "País desconocido";
+
+    tarea.value.ubicacion = `${city}, ${state}, ${country}`;
+  } catch (error) {
+    tarea.value.ubicacion = "Ubicación no disponible";
+    console.warn("No se pudo obtener la ubicación", error);
+  }
+};
+
+const submitTarea = async () => {
+  try {
+    await axios.post("/api/tareas", tarea.value);
+    router.push({ name: "tareas.generales" });
+  } catch (error) {
+    console.error("Error al crear la tarea", error);
+  }
+};
+
+onMounted(() => {
+  fetchData();
+  getUbicacion();
+});
 </script>
 
 <style scoped>
