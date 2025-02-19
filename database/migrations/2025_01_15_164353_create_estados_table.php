@@ -6,21 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
     public function up(): void
     {
         Schema::create('estados', function (Blueprint $table) {
-            $table->id(); // Identificador único del estado
-            $table->string('estado'); // Nombre del estado
-            $table->timestamps(); // Campos created_at y updated_at
+            $table->id(); 
+            $table->string('estado'); 
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+
     public function down(): void
     {
         Schema::dropIfExists('estados');

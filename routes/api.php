@@ -66,7 +66,6 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
     Route::apiResource('estados', EstadosController::class);
 });
 
-// api.php
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('tareas-usuario', [TareasController::class, 'getTareasUsuario']);
     Route::get('tareas-generales', [TareasController::class, 'getTareasGenerales']);

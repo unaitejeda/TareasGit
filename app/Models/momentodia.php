@@ -10,16 +10,12 @@ class MomentoDia extends Model
     use HasFactory;
     protected $table = 'momentodia'; 
 
-    /**
-     * Los atributos que se pueden asignar de manera masiva.
-     */
+
     protected $fillable = [
         'momento',
     ];
 
-    /**
-     * Relación con las tareas.
-     */
+
     public function tareas()
     {
         return $this->hasMany(tareas::class, 'idmomento');

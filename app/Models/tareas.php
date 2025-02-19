@@ -9,9 +9,6 @@ class tareas extends Model
 {
     use HasFactory;
 
-    /**
-     * Los atributos que se pueden asignar de manera masiva.
-     */
     protected $fillable = [
         'tarea',
         'descripcion',

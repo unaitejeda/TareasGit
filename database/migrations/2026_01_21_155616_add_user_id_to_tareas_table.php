@@ -6,14 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up()
 {
     Schema::table('tareas', function (Blueprint $table) {
-        $table->unsignedBigInteger('user_id')->after('id'); // Añadimos el campo user_id
-        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); // Relacionamos con la tabla users
+        $table->unsignedBigInteger('user_id')->after('id');
+        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
     });
 }
 

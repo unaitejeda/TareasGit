@@ -51,97 +51,81 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
-import GeolocationService from '/services/GeolocationService';
+import GeolocationService from "/services/GeolocationService";
 import { useRouter } from "vue-router";
 
+const tarea = ref({
+  tarea: "",
+  descripcion: "",
+  fecha: "",
+  idlugar: null,
+  idmomento: null,
+  idtipo: null,
+  ubicacion: "",
+  user_id: null,
+});
 
-export default {
-  setup() {
-    const tarea = ref({
-      tarea: "",
-      descripcion: "",
-      fecha: "",
-      idlugar: null,
-      idmomento: null,
-      idtipo: null,
-      ubicacion: "",
-      user_id: null,
-    });
+const lugares = ref([]);
+const momentos = ref([]);
+const tipos = ref([]);
+const usuarios = ref([]);
 
-    const lugares = ref([]);
-    const momentos = ref([]);
-    const tipos = ref([]);
-    const usuarios = ref([]);
+const router = useRouter();
 
-    const fetchData = async () => {
-      try {
-        const [lugaresData, momentosData, tiposData] = await Promise.all([
-          axios.get("/api/lugares"),
-          axios.get("/api/momentodia"),
-          axios.get("/api/tipos"),
-        ]);
-        lugares.value = lugaresData.data;
-        momentos.value = momentosData.data;
-        tipos.value = tiposData.data;
-      } catch (error) {
-        console.error("Error al obtener datos", error);
-      }
-    };
-
-    const fetchUsuarios = async () => {
-      try {
-        const response = await axios.get("/api/users");
-        usuarios.value = response.data;
-      } catch (error) {
-        console.error("Error al obtener usuarios", error);
-      }
-    };
-
-    const getUbicacion = async () => {
-      try {
-        const locationData = await GeolocationService.getLocation();
-        const city = locationData.city || locationData.district || "Ubicación desconocida";
-        const state = locationData.state_prov || "Provincia desconocida";
-        const country = locationData.country_name || "País desconocido";
-
-        tarea.value.ubicacion = `${city}, ${state}, ${country}`;
-      } catch (error) {
-        tarea.value.ubicacion = "Ubicación no disponible";
-        console.warn("No se pudo obtener la ubicación", error);
-      }
-    };
-
-    const router = useRouter();
-
-    const crearTarea = async () => {
-      try {
-        await axios.post("/api/tareas-asignadas", tarea.value);
-        router.push({ name: "tareas.generales" });
-      } catch (error) {
-        console.error("Error al asignar la tarea", error);
-      }
-    };
-
-
-    onMounted(() => {
-      fetchData();
-      fetchUsuarios();
-      getUbicacion();
-    });
-
-    return {
-      tarea,
-      lugares,
-      momentos,
-      tipos,
-      usuarios,
-      crearTarea,
-    };
+const fetchData = async () => {
+  try {
+    const [lugaresData, momentosData, tiposData] = await Promise.all([
+      axios.get("/api/lugares"),
+      axios.get("/api/momentodia"),
+      axios.get("/api/tipos"),
+    ]);
+    lugares.value = lugaresData.data;
+    momentos.value = momentosData.data;
+    tipos.value = tiposData.data;
+  } catch (error) {
+    console.error("Error al obtener datos", error);
   }
 };
+
+const fetchUsuarios = async () => {
+  try {
+    const response = await axios.get("/api/users");
+    usuarios.value = response.data;
+  } catch (error) {
+    console.error("Error al obtener usuarios", error);
+  }
+};
+
+const getUbicacion = async () => {
+  try {
+    const locationData = await GeolocationService.getLocation();
+    const city = locationData.city || locationData.district || "Ubicación desconocida";
+    const state = locationData.state_prov || "Provincia desconocida";
+    const country = locationData.country_name || "País desconocido";
+    tarea.value.ubicacion = `${city}, ${state}, ${country}`;
+  } catch (error) {
+    tarea.value.ubicacion = "Ubicación no disponible";
+    console.warn("No se pudo obtener la ubicación", error);
+  }
+};
+
+const crearTarea = async () => {
+  try {
+    await axios.post("/api/tareas-asignadas", tarea.value);
+    router.push({ name: "tareas.generales" });
+  } catch (error) {
+    console.error("Error al asignar la tarea", error);
+  }
+};
+
+onMounted(() => {
+  fetchData();
+  fetchUsuarios();
+  getUbicacion();
+});
 </script>
 
 <style scoped>

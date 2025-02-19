@@ -6,21 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
     public function up(): void
     {
         Schema::create('tipos', function (Blueprint $table) {
-            $table->id(); // Identificador único del tipo
-            $table->string('tipo'); // Nombre del tipo
-            $table->timestamps(); // Campos created_at y updated_at
+            $table->id(); 
+            $table->string('tipo'); 
+            $table->timestamps(); 
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+
     public function down(): void
     {
         Schema::dropIfExists('tipos');

@@ -14,8 +14,8 @@ class MomentoDiaController extends Controller
     public function index()
     {
         try {
-            $momentos = Momentodia::all(); // Obtén todos los registros
-            return response()->json($momentos, 200); // Devuelve en formato JSON
+            $momentos = Momentodia::all();
+            return response()->json($momentos, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al obtener momentos del día'], 500);
         }
